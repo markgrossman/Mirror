@@ -1,0 +1,9 @@
+{
+  "name": "Mirror-Server",
+  "version": "0.0.1",
+  "description": "Mirror Server",
+  "dependencies": {
+    "express": "^4.8.5",
+    "socket.io": "^1.0.6"
+  }
+}

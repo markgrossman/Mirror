@@ -1,0 +1,13 @@
+{
+  // Required
+  "manifest_version": 2,
+  "name": "Mirror JS",
+  "version": "1",
+
+  // Optional
+  "author": "Mark Grossman",
+  "content_scripts": [{
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["jquery-1.11.1.min.js",  "socket.io.js", "mirror.js"]
+    }]
+}
