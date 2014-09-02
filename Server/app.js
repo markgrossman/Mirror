@@ -6,14 +6,17 @@ app.get('/ping', function(req, res){
   res.send('<h1>Pong!</h1>');
 });
 
-
 io.on('connection', function(socket) {
     socket.on('textBox', function(data) {
         socket.broadcast.emit('textBox', data);
     });
 
-    socket.on('click', function(xpath) {
-        socket.broadcast.emit('click', xpath);
+    socket.on('click', function(path) {
+        socket.broadcast.emit('click', path);
+    });
+
+    socket.on('scroll', function(data) {
+    socket.broadcast.emit('scroll', data);
     });
 });
 

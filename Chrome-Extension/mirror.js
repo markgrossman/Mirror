@@ -1,47 +1,77 @@
 var socket = io.connect("http://localhost:3000");
 
 $("body").click(function(event) {
-    var value = getXPath(event);
+    var value = utils.getElementPath(event.target);
     socket.emit('click', value);
     console.log(value);
 });
 
 $('input').change(function(event) {
-    var value = getXPath(event);
+    var value = utils.getElementPath(event.target);
     socket.emit('textBox', {
         textEntered: $(event.target).val(),
         pathEntered: value
     });
 });
 
-var ClickXpath = ''
-socket.on('click', function(xpath) {
-    var node = document.evaluate(xpath, document, null, 9, null).singleNodeValue;
+$(document).scroll(function(event) {
+    console.log($(document).scrollTop());
+    socket.emit('scroll', {
+        top: $(document).scrollTop(),
+        left: $(document).scrollLeft()
+    });
+});
 
-    if (xpath !== ClickXpath) {
+var nodeClicked;
+socket.on('click', function(xpath) {
+    var node = utils.findElementByPath(xpath);
+    if (nodeClicked !== node) {
         node.click();
     }
-    ClickXpath = xpath;
+    nodeClicked = node;
 });
 
-var TextBoxXpath = ''
+socket.on('scroll', function(data) {
+    $(document).scrollTop(data.top);
+    $(document).scrollLeft(data.left);
+});
 
+var nodeTextEntered;
 socket.on('textBox', function(data) {
-    var node = document.evaluate(data.pathEntered, document, null, 9, null).singleNodeValue;
-
-    if (data.pathEntered !== TextBoxXpath) {
-        node.val(thing.data.textEntered);
+    var node = utils.findElementByPath(data.pathEntered);
+    console.log(node);
+    if (data.pathEntered !== nodeTextEntered) {
+        $(node).val(data.textEntered);
     }
-    TextBoxXpath = data.pathEntered;
+    nodeTextEntered = data.pathEntered;
 });
 
-function getXPath(event) {
-    var element = event.target;
-    var xpath = '';
-    for (; element && element.nodeType == 1; element = element.parentNode) {
-        var id = $(element.parentNode).children(element.tagName).index(element) + 1;
-        id > 1 ? (id = '[' + id + ']') : (id = '');
-        xpath = '/' + element.tagName.toLowerCase() + id + xpath;
+var utils = {
+    getElementPath: function(node) {
+        var path = [];
+
+        if (node.getAttribute("id")) {
+            return node.getAttribute("id");
+        }
+
+        while (node.parentNode) {
+            path.push(Array.prototype.slice.call(node.parentNode.childNodes, 0).indexOf(node));
+            node = node.parentNode;
+        }
+        return path.reverse();
+    },
+
+    findElementByPath: function(path) {
+
+        if (typeof path === "string") {
+            return document.getElementById(path);
+        }
+
+        var node = document;
+        for (var i = 0, n = path.length; i < n; i++) {
+            node = node.childNodes[path[i]];
+            if (!node) return;
+        }
+        return node;
     }
-    return xpath;
 }
