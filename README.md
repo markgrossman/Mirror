@@ -1,9 +1,9 @@
 Mirror
 ======
 
-Browser extensions and local server to help enable cross browser exploratory testing. Click a button or link in one browser and it's reflected in any other browsers with the plugin enabled.  
+Browser extensions and local server to help enable cross browser exploratory testing. Click a link or enter some text in one browser and it's reflected in any other browsers with the plugin enabled.  
 
-Right now, this is really just a proof of concept that I'l try to develop furthur. Currently it works with just regular http sites and clicks. Ideally, text input and https sites will be implemented next.  
+Right now, this is really just a proof of concept that I'l try to develop furthur.
 
 ###Current Plugins:  
 
