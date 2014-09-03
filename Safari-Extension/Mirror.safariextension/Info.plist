@@ -26,7 +26,7 @@
 			<array>
 				<string>jquery-1.11.1.min.js</string>
 				<string>socket.io.js</string>
-				<string>mirror.js</string>
+				<string>mirror.min.js</string>
 			</array>
 		</dict>
 	</dict>
