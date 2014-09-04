@@ -1,22 +1,26 @@
-/*! mirror - v - 2014-09-02
+/*! mirror - v - 2014-09-04
 * Copyright (c) 2014 ; Licensed  */
 var socket = io.connect("http://localhost:3000");
 
-$("body").click(function(event) {
-    var value = utils.getElementPath(event.target);
-    socket.emit('click', value);
+function inputChange(eventName, event) {
+    var nodePath = getElementPath(event.target);
+    socket.emit(eventName, {
+        textEntered: $(event.target).val(),
+        pathEntered: nodePath
+    });
+}
+
+$('body').click(function(event) {
+    var nodePath = getElementPath(event.target);
+    console.log(nodePath);
+    socket.emit('click', nodePath);
 });
 
 $('input').change(function(event) {
-    var value = utils.getElementPath(event.target);
-    socket.emit('textBox', {
-        textEntered: $(event.target).val(),
-        pathEntered: value
-    });
+    inputChange('textBox', event);
 });
 
-$(document).scroll(function(event) {
-    console.log($(document).scrollTop());
+$(document).scroll(function() {
     socket.emit('scroll', {
         top: $(document).scrollTop(),
         left: $(document).scrollLeft()
@@ -24,8 +28,8 @@ $(document).scroll(function(event) {
 });
 
 var nodeClicked;
-socket.on('click', function(xpath) {
-    var node = utils.findElementByPath(xpath);
+socket.on('click', function(nodePath) {
+    var node = findElementByPath(nodePath);
     if (nodeClicked !== node) {
         node.click();
     }
@@ -39,39 +43,37 @@ socket.on('scroll', function(data) {
 
 var nodeTextEntered;
 socket.on('textBox', function(data) {
-    var node = utils.findElementByPath(data.pathEntered);
-    console.log(node);
+    var node = findElementByPath(data.pathEntered);
     if (data.pathEntered !== nodeTextEntered) {
         $(node).val(data.textEntered);
     }
     nodeTextEntered = data.pathEntered;
 });
-var utils = {
-    getElementPath: function(node) {
-        var path = [];
+function getElementPath(node) {
+    var path = [];
 
-        if (node.getAttribute("id")) {
-            return node.getAttribute("id");
-        }
-
-        while (node.parentNode) {
-            path.push(Array.prototype.slice.call(node.parentNode.childNodes, 0).indexOf(node));
-            node = node.parentNode;
-        }
-        return path.reverse();
-    },
-
-    findElementByPath: function(path) {
-
-        if (typeof path === "string") {
-            return document.getElementById(path);
-        }
-
-        var node = document;
-        for (var i = 0, n = path.length; i < n; i++) {
-            node = node.childNodes[path[i]];
-            if (!node) return;
-        }
-        return node;
+    if (node.getAttribute("id")) {
+        return node.getAttribute("id");
     }
+
+    while (node.parentNode) {
+        path.push(Array.prototype.slice.call(node.parentNode.childNodes, 0).indexOf(node));
+        node = node.parentNode;
+    }
+    return path.reverse();
+}
+function findElementByPath(path) {
+
+    if (typeof path === "string") {
+        return document.getElementById(path);
+    }
+
+    var node = document;
+    for (var i = 0, n = path.length; i < n; i++) {
+        node = node.childNodes[path[i]];
+        if (!node) {
+            return;
+        }
+    }
+    return node;
 }

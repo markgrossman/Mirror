@@ -1,20 +1,24 @@
 var socket = io.connect("http://localhost:3000");
 
-$("body").click(function(event) {
-    var value = utils.getElementPath(event.target);
-    socket.emit('click', value);
+function inputChange(eventName, event) {
+    var nodePath = getElementPath(event.target);
+    socket.emit(eventName, {
+        textEntered: $(event.target).val(),
+        pathEntered: nodePath
+    });
+}
+
+$('body').click(function(event) {
+    var nodePath = getElementPath(event.target);
+    console.log(nodePath);
+    socket.emit('click', nodePath);
 });
 
 $('input').change(function(event) {
-    var value = utils.getElementPath(event.target);
-    socket.emit('textBox', {
-        textEntered: $(event.target).val(),
-        pathEntered: value
-    });
+    inputChange('textBox', event);
 });
 
-$(document).scroll(function(event) {
-    console.log($(document).scrollTop());
+$(document).scroll(function() {
     socket.emit('scroll', {
         top: $(document).scrollTop(),
         left: $(document).scrollLeft()
@@ -22,8 +26,8 @@ $(document).scroll(function(event) {
 });
 
 var nodeClicked;
-socket.on('click', function(xpath) {
-    var node = utils.findElementByPath(xpath);
+socket.on('click', function(nodePath) {
+    var node = findElementByPath(nodePath);
     if (nodeClicked !== node) {
         node.click();
     }
@@ -37,8 +41,7 @@ socket.on('scroll', function(data) {
 
 var nodeTextEntered;
 socket.on('textBox', function(data) {
-    var node = utils.findElementByPath(data.pathEntered);
-    console.log(node);
+    var node = findElementByPath(data.pathEntered);
     if (data.pathEntered !== nodeTextEntered) {
         $(node).val(data.textEntered);
     }

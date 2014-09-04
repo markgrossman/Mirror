@@ -53,8 +53,17 @@ module.exports = function(grunt) {
                 unused: true,
                 boss: true,
                 eqnull: true,
-                globals: {}
+                globals: {
+                    jQuery: false,
+                    "$": false,
+                    "io": false,
+                    "utils": false,
+                    console: true,
+                    module: true,
+                    document: true
+                }
             },
+            files: ['lib/*.js'],
             gruntfile: {
                 src: 'Gruntfile.js'
             }
@@ -62,7 +71,7 @@ module.exports = function(grunt) {
         watch: {
             gruntfile: {
                 files: ['<%= jshint.gruntfile.src %>', 'lib/*.js'],
-                tasks: ['jshint:gruntfile', 'concat', 'uglify']
+                tasks: ['concat', 'uglify']
             }
         }
     });
@@ -74,6 +83,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
 
     // Default task.
-    grunt.registerTask('default', ['jshint', 'watch', 'concat', 'uglify']);
+    grunt.registerTask('default', ['watch', 'concat', 'uglify']);
 
 };
